@@ -7,7 +7,7 @@ class Ingredients(models.Model):
 
 class Pizza(models.Model):
     name = models.CharField(max_length=200)
-    price = models.DecimalField(max_digits=2)
+    price = models.DecimalField(decimal_places=2, max_digits=4)
     ingredients = models.ManyToManyField(Ingredients)
 
 
