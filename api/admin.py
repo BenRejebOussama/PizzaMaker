@@ -1,3 +1,6 @@
 from django.contrib import admin
+from api.models import Pizza, Ingredients
 
-# Register your models here.
+@admin.register(Pizza, Ingredients)
+class GenericAdmin(admin.ModelAdmin):
+    pass
