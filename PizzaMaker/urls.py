@@ -27,5 +27,6 @@ router.register(r'pizza', views.PizzaViewSet)
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include(router.urls)),
-    path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    path('auth/', include('dj_rest_auth.urls',))
 ]
