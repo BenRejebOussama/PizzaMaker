@@ -1,25 +1,20 @@
 import pytest
 
-def conditional_retry(should_retry_func):
-    def decorator(test_func):
-        def wrapper(*args, **kwargs):
-            try:
-                return test_func(*args, **kwargs)
-            except AssertionError:
-                if should_retry_func():
-                    # une seule relance
-                    return test_func(*args, **kwargs)
-                raise
-        return wrapper
-    return decorator
+# Flag pour suivre si un test a déjà été relancé
+_retry_flag = {}
 
-# Exemple d'une fonction qui décide si on relance
 def should_retry():
-    # ici tu peux mettre ton API call, logique métier, etc.
+    # Ta logique métier : appel API, variable globale, etc.
     return True
 
-@pytest.mark.parametrize("page", ["homepage"], indirect=True)
-@conditional_retry(should_retry)
-def test_example(page):
-    page.goto("https://example.com")
-    assert page.title() == "Not the expected title"  # volontairement faux
+@pytest.hookimpl(hookwrapper=True)
+def pytest_runtest_call(item):
+    test_name = item.nodeid
+    try:
+        yield  # exécute le test normalement
+    except Exception:
+        if should_retry() and not _retry_flag.get(test_name, False):
+            _retry_flag[test_name] = True
+            item.obj(**item.funcargs)  # relance une seule fois le test
+        else:
+            raise
